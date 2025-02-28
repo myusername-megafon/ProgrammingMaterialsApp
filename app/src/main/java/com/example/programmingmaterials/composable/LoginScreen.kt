@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.programmingmaterials.model.LoginState
@@ -26,15 +28,25 @@ fun LoginScreen() {
         val viewModel = viewModel<LoginViewModel>()
         val screenState = viewModel.state
         Box(modifier = Modifier.padding(innerPadding)) {
-            LoginContent(screenState.value)
+            LoginContent(
+                screenState = screenState.value,
+                onEditEmail = { newEmail -> viewModel.onEditEmail(newEmail) },
+                onEditPassword = viewModel::onEditPassword,
+                onButtonClick = { viewModel.onClickButton() }
+            )
         }
     }
 }
 
 @Composable
-private fun LoginContent(screenState: LoginState) {
-    if(screenState.isProgress){
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+private fun LoginContent(
+    screenState: LoginState,
+    onEditEmail: (String) -> Unit = {},
+    onEditPassword: (String) -> Unit = {},
+    onButtonClick: () -> Unit = {}
+) {
+    if (screenState.isProgress) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
     } else {
@@ -46,16 +58,17 @@ private fun LoginContent(screenState: LoginState) {
         ) {
             OutlinedTextField(
                 value = screenState.emailText,
-                label = { Text("email") },
-                onValueChange = {}
+                label = { Text("Email") },
+                onValueChange = onEditEmail
             )
             OutlinedTextField(
+                visualTransformation = PasswordVisualTransformation(),
                 value = screenState.passwordText,
-                label = { Text("password") },
-                onValueChange = {}
+                label = { Text("Password") },
+                onValueChange = onEditPassword
             )
             Button(
-                onClick = { },
+                onClick = onButtonClick,
                 content = { Text("Sign In") }
             )
         }
