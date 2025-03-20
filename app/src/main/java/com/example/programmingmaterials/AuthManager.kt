@@ -1,5 +1,7 @@
 package com.example.programmingmaterials
 
+import kotlinx.coroutines.delay
+
 class AuthManager {
 
 
@@ -7,7 +9,10 @@ class AuthManager {
         return false
     }
 
-    fun logIn(email: String, password: String) {
+    suspend fun logIn(email: String, password: String) : Boolean{
+
+        delay(1000)
+        return true
 
     }
 }

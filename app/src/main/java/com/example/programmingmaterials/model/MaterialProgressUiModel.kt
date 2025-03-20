@@ -1,4 +1,4 @@
-package com.example.programmingmaterials
+package com.example.programmingmaterials.model
 
 data class MaterialProgressUiModel(
     val materialName: String,

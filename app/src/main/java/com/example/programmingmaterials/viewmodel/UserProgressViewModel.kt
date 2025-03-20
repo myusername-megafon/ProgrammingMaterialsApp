@@ -1,18 +1,20 @@
 package com.example.programmingmaterials.viewmodel
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.programmingmaterials.MaterialProgressUiModel
+import com.example.programmingmaterials.data.ProfileRepo
+import com.example.programmingmaterials.model.UserProgressScreenState
+import com.example.programmingmaterials.model.MaterialProgressUiModel
 import kotlinx.coroutines.launch
 
 class UserProgressViewModel(
 ) : ViewModel() {
 
-    val statusList = mutableStateOf(listOf(
-        MaterialProgressUiModel("Material 1", "Category 1", "Started"),
-        MaterialProgressUiModel("Material 2", "Category 2", "Started"),
-    ))
+    private val profileRepo = ProfileRepo()
+    val initialScreenState = UserProgressScreenState()
+    val screenState = mutableStateOf(initialScreenState)
 
     fun onBackClick() {
 
@@ -20,6 +22,28 @@ class UserProgressViewModel(
 
     init {
         viewModelScope.launch {
+            val startedMaterials = profileRepo.getStartedMaterials()
+            screenState.value = screenState.value.copy(materialProgressList = startedMaterials.map {
+                val materialName = it.materialPath.split("/")[1]
+                val materialCategory = it.materialPath.split("/")[0]
+                return@map MaterialProgressUiModel(materialName, materialCategory, it.status)
+            })
         }
+    }
+
+    fun onClickStatusMenuButton() {
+        screenState.value = screenState.value.copy(isStatusMenuExpanded = true)
+    }
+
+    fun onDismissStatusMenu() {
+        screenState.value = screenState.value.copy(isStatusMenuExpanded = false)
+    }
+
+    fun onClickCategoryMenuButton() {
+        screenState.value = screenState.value.copy(isCategoryMenuExpanded = true)
+    }
+
+    fun onDismissCategoryMenu() {
+        screenState.value = screenState.value.copy(isCategoryMenuExpanded = false)
     }
 }

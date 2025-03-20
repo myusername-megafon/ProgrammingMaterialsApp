@@ -1,6 +1,8 @@
 package com.example.programmingmaterials.composable
 
-import android.widget.ProgressBar
+import android.app.Activity
+import android.content.Intent
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,9 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.programmingmaterials.MainActivity
+import com.example.programmingmaterials.model.LoginEvent
 import com.example.programmingmaterials.model.LoginState
 import com.example.programmingmaterials.ui.theme.ProgrammingMaterialsTheme
 import com.example.programmingmaterials.viewmodel.LoginViewModel
@@ -27,6 +30,7 @@ fun LoginScreen() {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         val viewModel = viewModel<LoginViewModel>()
         val screenState = viewModel.state
+        ConsumeEvents(viewModel)
         Box(modifier = Modifier.padding(innerPadding)) {
             LoginContent(
                 screenState = screenState.value,
@@ -34,6 +38,18 @@ fun LoginScreen() {
                 onEditPassword = viewModel::onEditPassword,
                 onButtonClick = { viewModel.onClickButton() }
             )
+        }
+    }
+}
+
+@Composable
+private fun ConsumeEvents(viewModel: LoginViewModel) {
+    val event = viewModel.event.value
+    if (event?.isConsumed == false) {
+        event.isConsumed = true
+        if (event is LoginEvent.NavigateMain) {
+            val activity: Activity = LocalActivity.current!!
+            activity.startActivity(Intent(activity, MainActivity::class.java))
         }
     }
 }
@@ -51,12 +67,12 @@ private fun LoginContent(
         }
     } else {
         Column(
-            Modifier
-                .fillMaxSize(),
+            Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
+                isError = true,
                 value = screenState.emailText,
                 label = { Text("Email") },
                 onValueChange = onEditEmail
