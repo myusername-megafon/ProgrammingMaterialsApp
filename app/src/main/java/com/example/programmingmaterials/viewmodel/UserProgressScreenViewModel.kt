@@ -1,15 +1,17 @@
 package com.example.programmingmaterials.viewmodel
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.example.programmingmaterials.data.ProfileRepo
 import com.example.programmingmaterials.model.UserProgressScreenState
 import com.example.programmingmaterials.model.MaterialProgressUiModel
+import com.example.programmingmaterials.navigation.Routes
 import kotlinx.coroutines.launch
 
-class UserProgressViewModel(
+class UserProgressScreenViewModel(
 ) : ViewModel() {
 
     private val profileRepo = ProfileRepo()
