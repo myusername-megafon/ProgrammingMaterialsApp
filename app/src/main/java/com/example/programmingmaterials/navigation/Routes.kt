@@ -12,4 +12,7 @@ object Routes {
 
     @Serializable
     object UserProgress
+
+    @Serializable
+    object UserProfile
 }
