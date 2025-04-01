@@ -10,7 +10,4 @@ class UserProfileScreenViewModel(): ViewModel() {
     private val initState = UserProfileScreenState()
     val state = mutableStateOf(initState)
 
-    fun onMyMaterialsButtonClick(){
-
-    }
 }

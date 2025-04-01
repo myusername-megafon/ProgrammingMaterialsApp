@@ -117,16 +117,6 @@ fun MainScreenPreview() {
                 "Material1",
                 "Category1",
                 "Started"
-            ),
-            MaterialProgressUiModel(
-                "Material1",
-                "Category1",
-                "Started"
-            ),
-            MaterialProgressUiModel(
-                "Material1",
-                "Category1",
-                "Started"
             )
         )
         HomeScreenContent(HomeScreenState(testList))
