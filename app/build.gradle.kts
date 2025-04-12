@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -63,7 +64,11 @@ dependencies {
     implementation(libs.androidx.compose.material3)
 
     implementation(libs.dagger.hilt)
-    implementation(libs.dagger.hilt.compiler)
+    implementation(libs.dagger.hilt.navigation)
+    kapt(libs.dagger.hilt.compiler)
+
+    implementation(libs.squareup.retrofit2)
+    implementation(libs.squareup.retrofit2.converter)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

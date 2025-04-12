@@ -22,7 +22,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.programmingmaterials.model.UserProgressScreenState
 import com.example.programmingmaterials.model.MaterialProgressUiModel
 import com.example.programmingmaterials.ui.theme.ProgrammingMaterialsTheme
@@ -30,11 +30,10 @@ import com.example.programmingmaterials.viewmodel.UserProgressScreenViewModel
 
 @Composable
 fun UserProgressScreen() {
-
     ProgrammingMaterialsTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) {
             it
-            val viewModel: UserProgressScreenViewModel = viewModel()
+            val viewModel: UserProgressScreenViewModel = hiltViewModel()
             UserProgressScreenContent(
                 viewModel.screenState.value,
                 { viewModel.onBackClick() },

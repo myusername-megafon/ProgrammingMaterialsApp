@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.programmingmaterials.model.HomeScreenState
 import com.example.programmingmaterials.model.MaterialProgressUiModel
@@ -34,7 +35,7 @@ fun HomeScreen() {
     ProgrammingMaterialsTheme {
         Scaffold() {
             it
-            val viewModel = viewModel<HomeScreenViewModel>()
+            val viewModel = hiltViewModel<HomeScreenViewModel>()
             val screenState = viewModel.screenState
 
             HomeScreenContent(screenState.value)

@@ -9,13 +9,16 @@ import com.example.programmingmaterials.data.ProfileRepo
 import com.example.programmingmaterials.model.UserProgressScreenState
 import com.example.programmingmaterials.model.MaterialProgressUiModel
 import com.example.programmingmaterials.navigation.Routes
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UserProgressScreenViewModel(
+@HiltViewModel
+class UserProgressScreenViewModel @Inject constructor(
+    private val profileRepo: ProfileRepo
 ) : ViewModel() {
 
-    private val profileRepo = ProfileRepo()
-    val initialScreenState = UserProgressScreenState()
+    private val initialScreenState = UserProgressScreenState()
     val screenState = mutableStateOf(initialScreenState)
 
     fun onBackClick() {

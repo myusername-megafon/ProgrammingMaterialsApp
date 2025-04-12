@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,7 +34,9 @@ import com.example.programmingmaterials.navigation.Routes
 import com.example.programmingmaterials.ui.theme.ProgrammingMaterialsTheme
 import com.example.programmingmaterials.viewmodel.MainActivityViewModel
 import com.example.programmingmaterials.viewmodel.UserProfileScreenViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +44,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ProgrammingMaterialsTheme {
                 val navController = rememberNavController()
-                val viewModel = viewModel<MainActivityViewModel>()
+                val viewModel: MainActivityViewModel = hiltViewModel()
                 Scaffold(
                     bottomBar = { BottomMenu(navController, viewModel) },
                     modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
