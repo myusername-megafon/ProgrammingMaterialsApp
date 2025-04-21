@@ -1,39 +1,91 @@
 package com.example.programmingmaterials.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
-import com.example.programmingmaterials.data.ProfileRepo
+import com.example.programmingmaterials.data.repositories.MaterialRepo
+import com.example.programmingmaterials.data.repositories.ProgressRepo
 import com.example.programmingmaterials.model.UserProgressScreenState
 import com.example.programmingmaterials.model.MaterialProgressUiModel
-import com.example.programmingmaterials.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class UserProgressScreenViewModel @Inject constructor(
-    private val profileRepo: ProfileRepo
+    private val materialRepo: MaterialRepo,
+    private val progressRepo: ProgressRepo
 ) : ViewModel() {
 
     private val initialScreenState = UserProgressScreenState()
     val screenState = mutableStateOf(initialScreenState)
 
-    fun onBackClick() {
-
-    }
 
     init {
         viewModelScope.launch {
-            val startedMaterials = profileRepo.getStartedMaterials()
-            screenState.value = screenState.value.copy(materialProgressList = startedMaterials.map {
-                val materialName = it.materialPath.split("/")[1]
-                val materialCategory = it.materialPath.split("/")[0]
-                return@map MaterialProgressUiModel(materialName, materialCategory, it.status)
-            })
+            val allCategories = progressRepo.getAllCategories()
+            val allStatuses = progressRepo.getAllStatuses()
+            val allMaterials = materialRepo.getAllMaterials(1)
+                .map {
+                    MaterialProgressUiModel(
+                        id = it.id,
+                        materialName = it.name,
+                        categoryName = it.category,
+                        status = it.status ?: "Не начато"
+                    )
+                }
+
+            screenState.value = screenState.value.copy(
+                categoryMenuItemsList = allCategories.map { it.name },
+                statusMenuItemsList = allStatuses,
+                filteredMaterials = allMaterials,
+                materialProgressList = allMaterials
+            )
         }
+    }
+
+    private fun applyFilters(
+        materials: List<MaterialProgressUiModel>,
+        category: String?,
+        status: String?
+    ): List<MaterialProgressUiModel> {
+        return materials
+            .filter { material ->
+                (category == "Category" || category == null || material.categoryName == category)
+            }
+            .filter { material ->
+                (status == "Status" || status == null || material.status.equals(status, ignoreCase = true))
+            }
+    }
+
+    fun onCategorySelected(category: String) {
+        val newState = screenState.value.copy(
+            selectedCategory = category,
+            isCategoryMenuExpanded = false
+        )
+
+        screenState.value = newState.copy(
+            filteredMaterials = applyFilters(
+                materials = newState.materialProgressList,
+                category = newState.selectedCategory,
+                status = newState.selectedStatus
+            )
+        )
+    }
+
+    fun onStatusSelected(status: String) {
+        val newState = screenState.value.copy(
+            selectedStatus = status,
+            isStatusMenuExpanded = false
+        )
+
+        screenState.value = newState.copy(
+            filteredMaterials = applyFilters(
+                materials = newState.materialProgressList,
+                category = newState.selectedCategory,
+                status = newState.selectedStatus
+            )
+        )
     }
 
     fun onClickStatusMenuButton() {

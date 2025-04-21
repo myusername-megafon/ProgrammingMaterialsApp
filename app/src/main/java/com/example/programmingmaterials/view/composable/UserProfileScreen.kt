@@ -1,4 +1,4 @@
-package com.example.programmingmaterials.composable
+package com.example.programmingmaterials.view.composable
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Menu
@@ -37,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -50,7 +52,7 @@ fun UserProfileScreen(navHostController: NavHostController) {
     ProgrammingMaterialsTheme {
         Scaffold {
             it
-            val viewModel = viewModel<UserProfileScreenViewModel>()
+            val viewModel = hiltViewModel<UserProfileScreenViewModel>()
             val state = viewModel.state.value
             UserProfileScreenContent(state,navHostController)
         }
@@ -83,7 +85,7 @@ fun UserProfileScreenContent(state: UserProfileScreenState,navHostController: Na
                     .padding(8.dp)
             )
             Text(
-                text = "Hello, User",
+                text = "Hello, " + state.userName,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(vertical = 8.dp)
@@ -113,7 +115,7 @@ fun UserProfileScreenContent(state: UserProfileScreenState,navHostController: Na
                         .weight(1f)
                 ) {
                     Text(
-                        "20",
+                        text = state.finishedMaterials.toString(),
                         color = Color.Blue,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -134,7 +136,7 @@ fun UserProfileScreenContent(state: UserProfileScreenState,navHostController: Na
                         .weight(1f)
                 ) {
                     Text(
-                        "2",
+                        text = state.pendingMaterials.toString(),
                         color = Color.Blue,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -155,7 +157,7 @@ fun UserProfileScreenContent(state: UserProfileScreenState,navHostController: Na
                         .weight(1f)
                 ) {
                     Text(
-                        "1",
+                        text = state.startedMaterials.toString(),
                         color = Color.Blue,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -202,7 +204,7 @@ fun UserProfileScreenContent(state: UserProfileScreenState,navHostController: Na
             }
             HorizontalDivider()
             Button(
-                onClick = {},
+                onClick = { navHostController.navigate(Routes.UserFeedbacks) },
                 colors = ButtonColors(
                     containerColor = Color.Gray,
                     contentColor = Color.Blue,
@@ -213,6 +215,20 @@ fun UserProfileScreenContent(state: UserProfileScreenState,navHostController: Na
             ) {
                 Icon(imageVector = Icons.Default.Create, contentDescription = null)
                 Text("My Feedbacks", fontSize = 20.sp)
+            }
+            HorizontalDivider()
+            Button(
+                onClick = { },
+                colors = ButtonColors(
+                    containerColor = Color.Gray,
+                    contentColor = Color.Blue,
+                    disabledContentColor = Color.Black,
+                    disabledContainerColor = Color.Black
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(imageVector = Icons.Default.Check, contentDescription = null)
+                Text("Тестирование", fontSize = 20.sp)
             }
             HorizontalDivider()
         }

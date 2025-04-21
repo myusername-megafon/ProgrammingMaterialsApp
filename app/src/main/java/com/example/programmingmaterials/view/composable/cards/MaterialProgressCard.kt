@@ -1,5 +1,6 @@
-package com.example.programmingmaterials.composable
+package com.example.programmingmaterials.view.composable.cards
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,9 +19,16 @@ import com.example.programmingmaterials.ui.theme.ProgrammingMaterialsTheme
 
 
 @Composable
-fun MaterialProgressCard(uiModel: MaterialProgressUiModel) {
-    val (materialName: String, categoryName: String, status: String) = uiModel
-    Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)) {
+fun MaterialProgressCard(
+    uiModel: MaterialProgressUiModel,
+    onClick: (Int) -> Unit
+) {
+    val (id: Int, materialName: String, categoryName: String, status: String) = uiModel
+    Column(
+        modifier = Modifier
+            .clickable(onClick = { onClick(uiModel.id) })
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+    ) {
         Text(materialName, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -37,7 +45,15 @@ fun MaterialProgressCard(uiModel: MaterialProgressUiModel) {
 @Preview(showBackground = true, widthDp = 200)
 fun MaterialProgressPreview() {
     ProgrammingMaterialsTheme {
-        MaterialProgressCard(MaterialProgressUiModel("Material 1", "Category 1", "Started"))
+        MaterialProgressCard(
+            MaterialProgressUiModel(
+                1,
+                "Material 1",
+                "Category 1",
+                "Started"
+            ),
+            onClick = {}
+        )
     }
 }
 
@@ -48,10 +64,12 @@ fun MaterialProgressPreviewLongLines() {
     ProgrammingMaterialsTheme {
         MaterialProgressCard(
             MaterialProgressUiModel(
+                1,
                 "Material 1 with very long string in material name",
                 "Category 1",
                 "Started"
-            )
+            ),
+            onClick = {}
         )
     }
 }

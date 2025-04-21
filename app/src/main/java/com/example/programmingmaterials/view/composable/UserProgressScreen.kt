@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.programmingmaterials.composable
+package com.example.programmingmaterials.view.composable
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,26 +21,32 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.programmingmaterials.view.composable.cards.MaterialProgressCard
 import com.example.programmingmaterials.model.UserProgressScreenState
 import com.example.programmingmaterials.model.MaterialProgressUiModel
 import com.example.programmingmaterials.ui.theme.ProgrammingMaterialsTheme
 import com.example.programmingmaterials.viewmodel.UserProgressScreenViewModel
 
 @Composable
-fun UserProgressScreen() {
+fun UserProgressScreen(navController: NavController) {
     ProgrammingMaterialsTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) {
             it
             val viewModel: UserProgressScreenViewModel = hiltViewModel()
             UserProgressScreenContent(
+                navController = navController,
                 viewModel.screenState.value,
-                { viewModel.onBackClick() },
                 { viewModel.onClickStatusMenuButton() },
                 { viewModel.onDismissStatusMenu() },
                 { viewModel.onClickCategoryMenuButton() },
-                { viewModel.onDismissCategoryMenu() }
+                { viewModel.onDismissCategoryMenu() },
+                { category -> viewModel.onCategorySelected(category) },
+                { status -> viewModel.onStatusSelected(status) },
             )
         }
     }
@@ -49,12 +55,14 @@ fun UserProgressScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProgressScreenContent(
+    navController: NavController,
     stateScreen: UserProgressScreenState,
-    onBackClick: () -> Unit,
     onStatusMenuButtonClick: () -> Unit,
     onDismissStatusMenu: () -> Unit,
     onCategoryMenuButtonClick: () -> Unit,
-    onDismissCategoryMenu: () -> Unit
+    onDismissCategoryMenu: () -> Unit,
+    onCategorySelected: (String) -> Unit,
+    onStatusSelected: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -63,7 +71,7 @@ fun UserProgressScreenContent(
         TopAppBar(
             title = { Text("Progress") },
             navigationIcon = {
-                IconButton(onClick = { onBackClick() }) {
+                IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,
                         contentDescription = null
@@ -74,33 +82,49 @@ fun UserProgressScreenContent(
         Row {
             Button(onClick = { onStatusMenuButtonClick() }) {
                 Icon(Icons.AutoMirrored.Default.List, null)
-                Text("StatusMaterial")
+                Text(stateScreen.selectedStatus ?: "Status")
                 DropdownMenu(
                     expanded = stateScreen.isStatusMenuExpanded,
-                    onDismissRequest = { onDismissStatusMenu() }) {
-                    stateScreen.statusMenuItemsList.forEach { item ->
-                        DropdownMenuItem(text = { Text(text = item) }, onClick = {})
+                    onDismissRequest = { onDismissStatusMenu() }
+                ) {
+                    stateScreen.statusMenuItemsList.forEach { status ->
+                        DropdownMenuItem(
+                            text = { Text(status) },
+                            onClick = { onStatusSelected(status) }
+                        )
                     }
                 }
             }
+
             Button(onClick = { onCategoryMenuButtonClick() }) {
                 Icon(Icons.AutoMirrored.Default.List, null)
-                Text("Category")
+                Text(
+                    stateScreen.selectedCategory ?: "Category",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
                 DropdownMenu(
                     expanded = stateScreen.isCategoryMenuExpanded,
-                    onDismissRequest = { onDismissCategoryMenu() }) {
-                    stateScreen.categoryMenuItemsList.forEach { item ->
-                        DropdownMenuItem(text = { Text(text = item) }, onClick = {})
+                    onDismissRequest = { onDismissCategoryMenu() }
+                ) {
+                    stateScreen.categoryMenuItemsList.map { category ->
+                        DropdownMenuItem(
+                            text = { Text(category) },
+                            onClick = { onCategorySelected(category) }
+                        )
                     }
                 }
             }
         }
         LazyColumn {
-            items(stateScreen.materialProgressList) { uiModel ->
-                MaterialProgressCard(uiModel)
+            items(stateScreen.filteredMaterials) { uiModel ->
+                MaterialProgressCard(uiModel = uiModel, onClick = { materialId ->
+                    navController.navigate("material_details/$materialId")
+                })
             }
         }
     }
+
 }
 
 @Composable
@@ -108,16 +132,18 @@ fun UserProgressScreenContent(
 fun PreviewScreen(modifier: Modifier = Modifier) {
     ProgrammingMaterialsTheme {
         UserProgressScreenContent(
+            rememberNavController(),
             UserProgressScreenState(
                 materialProgressList = listOf(
-                    MaterialProgressUiModel("Material 1", "Category 1", "Started"),
-                    MaterialProgressUiModel("Material 2", "Category 2", "Started"),
+                    MaterialProgressUiModel(1, "Material 1", "Category 1", "Started"),
+                    MaterialProgressUiModel(2, "Material 2", "Category 2", "Started"),
                 )
             ),
-            onBackClick = { },
             onStatusMenuButtonClick = {},
             onDismissStatusMenu = {},
             onCategoryMenuButtonClick = {},
-            onDismissCategoryMenu = {})
+            onDismissCategoryMenu = {},
+            onCategorySelected = {},
+            onStatusSelected = {})
     }
 }

@@ -1,4 +1,4 @@
-package com.example.programmingmaterials.composable
+package com.example.programmingmaterials.view.composable
 
 import android.app.Activity
 import android.content.Intent
@@ -19,12 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.programmingmaterials.MainActivity
+import com.example.programmingmaterials.view.MainActivity
 import com.example.programmingmaterials.model.LoginEvent
 import com.example.programmingmaterials.model.LoginState
-import com.example.programmingmaterials.navigation.Routes
 import com.example.programmingmaterials.ui.theme.ProgrammingMaterialsTheme
 import com.example.programmingmaterials.viewmodel.LoginViewModel
 

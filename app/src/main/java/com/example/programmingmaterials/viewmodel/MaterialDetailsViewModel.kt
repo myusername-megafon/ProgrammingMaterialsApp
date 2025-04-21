@@ -1,9 +1,12 @@
 package com.example.programmingmaterials.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.programmingmaterials.data.MaterialRepo
+import com.example.programmingmaterials.data.repositories.FeedbackRepo
+import com.example.programmingmaterials.data.repositories.MaterialRepo
+import com.example.programmingmaterials.data.repositories.ProgressRepo
 import com.example.programmingmaterials.model.MaterialDetailsScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -11,15 +14,121 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MaterialDetailsViewModel @Inject constructor(
-    materialRepo: MaterialRepo
+    materialRepo: MaterialRepo,
+    private val progressRepo: ProgressRepo,
+    private val feedbackRepo: FeedbackRepo,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val initState = MaterialDetailsScreenState()
     val state = mutableStateOf(initState)
 
     init {
         viewModelScope.launch {
-            materialRepo.getMaterialById()
+            val materialId = savedStateHandle.get<Int>("materialId")
+            val material = materialRepo.getMaterialById(materialId = materialId!!, userID = 1)
+            state.value = state.value.copy(
+                materialName = material.name,
+                categoryName = material.category,
+                authorName = material.author,
+                materialText = material.content,
+                status = material.status ?: "Не начато"
+            )
         }
+    }
+
+    fun handleStartButtonClick() {
+        viewModelScope.launch {
+            try {
+                when (state.value.status) {
+                    "Не начато" -> {
+                        progressRepo.createProgressEntry(
+                            userId = 1,
+                            materialId = savedStateHandle.get<Int>("materialId")!!,
+                            status = "В процессе"
+                        )
+                        updateState("В процессе")
+                    }
+
+                    "Отложено" -> {
+                        progressRepo.updateProgressStatus(
+                            userId = 1,
+                            materialId = savedStateHandle.get<Int>("materialId")!!,
+                            newStatus = "В процессе"
+                        )
+                        updateState("В процессе")
+                    }
+                }
+            } catch (e: Exception) {
+                throw e
+            }
+        }
+    }
+
+    fun handleSecondButtonClick() {
+        viewModelScope.launch {
+            try {
+                when (state.value.status) {
+                    "В процессе" -> {
+                        progressRepo.updateProgressStatus(
+                            userId = 1,
+                            materialId = savedStateHandle.get<Int>("materialId")!!,
+                            newStatus = "Отложено"
+                        )
+                        updateState("Отложено")
+                    }
+                    // Добавьте другие кейсы при необходимости
+                }
+            } catch (e: Exception) {
+                throw e
+            }
+        }
+    }
+
+    private fun updateState(newStatus: String) {
+        state.value = state.value.copy(
+            status = newStatus
+        )
+    }
+
+    fun loadReviews() {
+        viewModelScope.launch {
+            try {
+                val reviews = feedbackRepo.getMaterialFeedbacks(
+                    savedStateHandle.get<Int>("materialId")!!
+                )
+                state.value = state.value.copy(
+                    reviews = reviews
+                )
+            } catch (e: Exception) {
+                throw e
+            }
+        }
+    }
+
+    fun addReview(content: String, rating: Int) {
+        viewModelScope.launch {
+            try {
+                feedbackRepo.AddFeedback(
+                    materialId = savedStateHandle.get<Int>("materialId")!!,
+                    userId = 1, // Замените на реальный ID пользователя
+                    content = content,
+                    rating = rating
+
+                )
+                loadReviews()
+                closeAddFeedbackDialog()
+            } catch (e: Exception) {
+                throw e
+            }
+        }
+    }
+
+    fun openAddFeedbackDialog() {
+        state.value = state.value.copy(showAddFeedbackDialog = true)
+    }
+
+    fun closeAddFeedbackDialog() {
+        state.value = state.value.copy(showAddFeedbackDialog = false)
     }
 }
 

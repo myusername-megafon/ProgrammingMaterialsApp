@@ -15,4 +15,15 @@ object Routes {
 
     @Serializable
     object UserProfile
+
+    @Serializable
+    object UserFeedbacks
+
+    @Serializable
+    data class MaterialDetails(val materialId: Int) {
+        companion object {
+            const val route = "material_details/{materialId}"
+            fun createRoute(materialId: Int) = "material_details/$materialId"
+        }
+    }
 }

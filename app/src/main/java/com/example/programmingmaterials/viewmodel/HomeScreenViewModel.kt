@@ -3,11 +3,9 @@ package com.example.programmingmaterials.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.compose.rememberNavController
-import com.example.programmingmaterials.data.MaterialRepo
+import com.example.programmingmaterials.data.repositories.MaterialRepo
 import com.example.programmingmaterials.model.HomeScreenState
 import com.example.programmingmaterials.model.MaterialProgressUiModel
-import com.example.programmingmaterials.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,17 +19,26 @@ class HomeScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val newMaterials = materialRepo.getAllNewMaterials("1")
+            val newMaterials = materialRepo.getNewMaterials(1)
+            val startedMaterials = materialRepo.getStartedMaterials(1)
             screenState.value = screenState.value.copy(
                 newMaterialsList = newMaterials.map {
                     MaterialProgressUiModel(
+                        id = it.id,
                         materialName = it.name,
-                        categoryName = it.category.name,
+                        categoryName = it.category,
+                        status = "New"
+                    )
+                },
+                startedMaterialsList = startedMaterials.map {
+                    MaterialProgressUiModel(
+                        id = it.id,
+                        materialName = it.name,
+                        categoryName = it.category,
                         status = "New"
                     )
                 }
             )
         }
-
     }
 }
