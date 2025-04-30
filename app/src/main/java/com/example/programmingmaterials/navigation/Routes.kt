@@ -20,6 +20,9 @@ object Routes {
     object UserFeedbacks
 
     @Serializable
+    object Tests
+
+    @Serializable
     data class MaterialDetails(val materialId: Int) {
         companion object {
             const val route = "material_details/{materialId}"

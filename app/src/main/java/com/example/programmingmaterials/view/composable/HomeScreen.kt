@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,7 +53,10 @@ fun HomeScreenContent(
     state: HomeScreenState,
     onMaterialClick: (Int) -> Unit
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Column {
             TextField(
                 value = "",
@@ -59,53 +64,69 @@ fun HomeScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                    .clip(RoundedCornerShape(16.dp)),
-                placeholder = { Text("Search...") },
-                singleLine = true
+                    .clip(MaterialTheme.shapes.medium),
+                placeholder = {
+                    Text(
+                        "Поиск...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
             )
             Text(
-                text = "Started materials",
+                text = "Начатые материалы",
                 modifier = Modifier.padding(8.dp),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary
             )
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(8.dp)
             ) {
                 items(state.startedMaterialsList) {
-                    MaterialProgressCard2(uiModel = it, cardColor = Color.LightGray, onClick = {onMaterialClick(it.id)})
-
+                    MaterialProgressCard2(
+                        uiModel = it,
+                        cardColor = MaterialTheme.colorScheme.surfaceVariant,
+                        onClick = { onMaterialClick(it.id) }
+                    )
                 }
             }
         }
         Column(
             modifier = Modifier
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color.LightGray)
+                .clip(MaterialTheme.shapes.large)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
                 .padding(8.dp)
                 .fillMaxSize()
-
         ) {
             Text(
-                text = "Recomendation",
+                text = "Рекомендации",
                 modifier = Modifier.padding(8.dp),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary
             )
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(8.dp)
             ) {
                 items(state.newMaterialsList) {
-                    MaterialProgressCard2(uiModel = it, cardColor = Color.Gray, onClick = {onMaterialClick(it.id)})
+                    MaterialProgressCard2(
+                        uiModel = it,
+                        cardColor = MaterialTheme.colorScheme.surface,
+                        onClick = { onMaterialClick(it.id) }
+                    )
                 }
             }
         }
-
     }
 }
-
 @Composable
 @Preview(showBackground = true)
 fun MainScreenPreview() {

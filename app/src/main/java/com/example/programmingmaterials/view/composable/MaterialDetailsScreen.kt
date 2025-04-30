@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -62,8 +63,8 @@ fun MaterialDetailsScreen(
                     .fillMaxSize()
                     .padding(paddingValues),
                 navController = navController,
-                onStartButtonClick = {viewModel.handleStartButtonClick()},
-                onSecondButtonClick = {viewModel.handleSecondButtonClick()},
+                onStartButtonClick = { viewModel.handleStartButtonClick() },
+                onSecondButtonClick = { viewModel.handleSecondButtonClick() },
                 onAddReviewClick = { viewModel.openAddFeedbackDialog() }
             )
             if (viewModel.state.value.showAddFeedbackDialog) {
@@ -108,10 +109,15 @@ fun MaterialDetailsScreenContent(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = null
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                )
             )
 
             Row(
@@ -150,7 +156,6 @@ fun MaterialDetailsScreenContent(
                     Spacer(Modifier.size(16.dp))
                 }
 
-                // Секция отзывов
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -162,22 +167,25 @@ fun MaterialDetailsScreenContent(
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
-
                         IconButton(
-                            onClick ={ onAddReviewClick() },
+                            onClick = { onAddReviewClick() },
                             modifier = Modifier.size(24.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "Добавить отзыв"
+                                contentDescription = "Добавить отзыв",
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
                 }
 
-                // Список отзывов
-                items(state.reviews){ review ->
-                    ReviewCard(review = review, usageScreen = "DetailsMaterial",{})
+                items(state.reviews) { review ->
+                    ReviewCard(
+                        review = review,
+                        usageScreen = "DetailsMaterial",
+                        onDeleteButtonClick = {}
+                    )
                 }
             }
 
@@ -187,70 +195,60 @@ fun MaterialDetailsScreenContent(
                     .padding(horizontal = 8.dp)
             ) {
                 Button(
-                    onClick = {
-                        when (state.status) {
-                            "Не начато", "Отложено" -> onStartButtonClick()
-                            "В процессе" -> onSecondButtonClick()
-                        }
-                    },
+                    onClick = { /* ... */ },
                     modifier = Modifier
                         .weight(0.8f)
                         .height(48.dp),
                     enabled = state.status != "Завершено",
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = when {
-                            state.status == "В процессе" -> MaterialTheme.colorScheme.surfaceVariant
-                            state.status == "Завершено" -> MaterialTheme.colorScheme.surfaceVariant
+                        containerColor = when (state.status) {
+                            "Завершено" -> MaterialTheme.colorScheme.surfaceVariant
                             else -> MaterialTheme.colorScheme.primary
                         },
-                        contentColor = when {
-                            state.status == "В процессе" -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                            state.status == "Завершено" -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                        contentColor = when (state.status) {
+                            "Завершено" -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                             else -> MaterialTheme.colorScheme.onPrimary
                         }
                     )
                 ) {
                     Text(
                         text = when (state.status) {
-                            "В процессе" -> "В процессе"
+                            "В процессе" -> "Завершить"
                             "Отложено" -> "Возобновить"
                             "Завершено" -> "Завершено"
                             else -> "Начать"
-                        }
+                        },
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
 
                 if (state.status != "Завершено") {
-                    val (icon, enabled) = when (state.status) {
-                        "В процессе" -> Pair(Icons.Default.AddCircle, true)
-                        "Отложено" -> Pair(Icons.Default.DateRange, false)
-                        else -> Pair(Icons.Default.AddCircle, false)
-                    }
-
                     Button(
-                        onClick = {
-                            when (state.status) {
-                                "В процессе" -> onSecondButtonClick()
-                                "Не начато" -> onSecondButtonClick()
-                            }
-                        },
+                        onClick = { onSecondButtonClick() },
                         modifier = Modifier
                             .weight(0.2f)
                             .height(48.dp),
-                        enabled = enabled,
+                        enabled = state.status == "В процессе" || state.status == "Не начато",
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (enabled) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surfaceVariant,
-                            contentColor = if (enabled) MaterialTheme.colorScheme.onPrimary
-                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            containerColor = if (state.status == "В процессе" || state.status == "Не начато")
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = if (state.status == "В процессе" || state.status == "Не начато")
+                                MaterialTheme.colorScheme.onPrimary
+                            else
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                         )
                     ) {
                         Icon(
-                            imageVector = icon,
+                            imageVector = if (state.status == "В процессе")
+                                Icons.Default.Add
+                            else
+                                Icons.Default.DateRange,
                             contentDescription = null,
-                            modifier = Modifier.size(24.dp)
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }

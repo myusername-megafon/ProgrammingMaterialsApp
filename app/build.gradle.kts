@@ -62,6 +62,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
 
     implementation(libs.dagger.hilt)
     implementation(libs.dagger.hilt.navigation)

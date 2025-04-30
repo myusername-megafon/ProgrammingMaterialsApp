@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.programmingmaterials.data.DTOClasses.FeedbackDTO
 import com.example.programmingmaterials.ui.theme.ProgrammingMaterialsTheme
@@ -45,9 +46,14 @@ fun ReviewCard(review: FeedbackDTO, usageScreen: String, onDeleteButtonClick: (I
                 ) {
                     Text(
                         text = if (usageScreen == "DetailsMaterial") review.userName else review.materialName,
+                        maxLines = 1,
+                        overflow = TextOverflow.Visible,
+                        modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
+
+                    Spacer(Modifier.width(8.dp))
 
                     RatingBar(
                         rating = review.rating,
@@ -109,7 +115,7 @@ fun PreviewReviewCard() {
         ReviewCard(
             FeedbackDTO(
                 1,
-                "materialName",
+                "materialNameWithVeryLongString123245",
                 "User Userovich",
                 "amazing material",
                 4,

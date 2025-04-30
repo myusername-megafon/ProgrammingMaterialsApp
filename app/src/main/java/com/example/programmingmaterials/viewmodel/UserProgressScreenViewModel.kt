@@ -3,6 +3,7 @@ package com.example.programmingmaterials.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.programmingmaterials.AuthManager
 import com.example.programmingmaterials.data.repositories.MaterialRepo
 import com.example.programmingmaterials.data.repositories.ProgressRepo
 import com.example.programmingmaterials.model.UserProgressScreenState
@@ -14,7 +15,8 @@ import javax.inject.Inject
 @HiltViewModel
 class UserProgressScreenViewModel @Inject constructor(
     private val materialRepo: MaterialRepo,
-    private val progressRepo: ProgressRepo
+    private val progressRepo: ProgressRepo,
+    private val authManager: AuthManager
 ) : ViewModel() {
 
     private val initialScreenState = UserProgressScreenState()
@@ -25,7 +27,7 @@ class UserProgressScreenViewModel @Inject constructor(
         viewModelScope.launch {
             val allCategories = progressRepo.getAllCategories()
             val allStatuses = progressRepo.getAllStatuses()
-            val allMaterials = materialRepo.getAllMaterials(1)
+            val allMaterials = materialRepo.getAllMaterials(authManager.getUserId())
                 .map {
                     MaterialProgressUiModel(
                         id = it.id,

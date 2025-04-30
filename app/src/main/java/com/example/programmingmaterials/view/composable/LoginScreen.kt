@@ -6,19 +6,25 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.programmingmaterials.view.MainActivity
 import com.example.programmingmaterials.model.LoginEvent
 import com.example.programmingmaterials.model.LoginState
@@ -27,18 +33,24 @@ import com.example.programmingmaterials.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen() {
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        val viewModel = viewModel<LoginViewModel>()
-        val screenState = viewModel.state
-        ConsumeEvents(viewModel)
+    ProgrammingMaterialsTheme {
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            val viewModel = hiltViewModel<LoginViewModel>()
+            val screenState = viewModel.state
+            ConsumeEvents(viewModel)
 
-        Box(modifier = Modifier.padding(innerPadding)) {
-            LoginContent(
-                screenState = screenState.value,
-                onEditEmail = { newEmail -> viewModel.onEditEmail(newEmail) },
-                onEditPassword = viewModel::onEditPassword,
-                onButtonClick = { viewModel.onClickButton() }
-            )
+            Box(modifier = Modifier.padding(innerPadding)) {
+                LoginContent(
+                    screenState = screenState.value,
+                    onEditEmail = { newEmail -> viewModel.onEditEmail(newEmail) },
+                    onEditPassword = viewModel::onEditPassword,
+                    onButtonClick = { viewModel.onClickButton() },
+                    onRegButtonClick = { viewModel.onRegButtonClick() },
+                    onEditFIOReg = { newText -> viewModel.onEditFIOReg(newText) },
+                    onClickLoginButtonReg = { viewModel.onClickLoginButtonReg() },
+                    onClickRegButtonReg = { viewModel.onClickRegButtonReg() },
+                )
+            }
         }
     }
 }
@@ -60,35 +72,136 @@ private fun LoginContent(
     screenState: LoginState,
     onEditEmail: (String) -> Unit = {},
     onEditPassword: (String) -> Unit = {},
-    onButtonClick: () -> Unit = {}
+    onButtonClick: () -> Unit = {},
+    onRegButtonClick: () -> Unit = {},
+    onEditFIOReg: (String) -> Unit = {},
+    onClickRegButtonReg: () -> Unit = {},
+    onClickLoginButtonReg: () -> Unit = {}
 ) {
-    if (screenState.isProgress) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+    when {
+        !screenState.isLoginScreen -> {
+            if (screenState.isProgress) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
+            } else {
+                Column(
+                    Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    OutlinedTextField(
+                        isError = screenState.isDataError,
+                        value = screenState.FIOValue,
+                        label = { Text("ФИО", style = MaterialTheme.typography.bodyMedium) },
+                        onValueChange = onEditFIOReg,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        )
+                    )
+                    OutlinedTextField(
+                        isError = screenState.isDataError,
+                        value = screenState.emailText,
+                        label = { Text("Email", style = MaterialTheme.typography.bodyMedium) },
+                        onValueChange = onEditEmail,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        )
+                    )
+                    OutlinedTextField(
+                        isError = screenState.isDataError,
+                        visualTransformation = PasswordVisualTransformation(),
+                        value = screenState.passwordText,
+                        label = { Text("Пароль", style = MaterialTheme.typography.bodyMedium) },
+                        onValueChange = onEditPassword,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        )
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Button(
+                        onClick = { onClickRegButtonReg() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Text("Зарегистрироваться", style = MaterialTheme.typography.labelLarge)
+                    }
+                    Text(text = "или", color = MaterialTheme.colorScheme.onSurface)
+                    Button(
+                        onClick = onClickLoginButtonReg,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary
+                        )
+                    ) {
+                        Text("Войти", style = MaterialTheme.typography.labelLarge)
+                    }
+                }
+            }
         }
-    } else {
-        Column(
-            Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                isError = true,
-                value = screenState.emailText,
-                label = { Text("Email") },
-                onValueChange = onEditEmail
-            )
-            OutlinedTextField(
-                visualTransformation = PasswordVisualTransformation(),
-                value = screenState.passwordText,
-                label = { Text("Password") },
-                onValueChange = onEditPassword
-            )
-            Button(
-                onClick = onButtonClick,
-                content = { Text("Sign In") }
-            )
+
+        screenState.isLoginScreen -> {
+            if (screenState.isProgress) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
+            } else {
+                Column(
+                    Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    OutlinedTextField(
+                        isError = screenState.isDataError,
+                        value = screenState.emailText,
+                        label = { Text("Email", style = MaterialTheme.typography.bodyMedium) },
+                        onValueChange = onEditEmail,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        )
+                    )
+                    OutlinedTextField(
+                        isError = screenState.isDataError,
+                        visualTransformation = PasswordVisualTransformation(),
+                        value = screenState.passwordText,
+                        label = { Text("Пароль", style = MaterialTheme.typography.bodyMedium) },
+                        onValueChange = onEditPassword,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        )
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Button(
+                        onClick = onButtonClick,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Text("Войти", style = MaterialTheme.typography.labelLarge)
+                    }
+                    Text(text = "или", color = MaterialTheme.colorScheme.onSurface)
+                    Button(
+                        onClick = onRegButtonClick,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary
+                        )
+                    ) {
+                        Text("Зарегистрироваться", style = MaterialTheme.typography.labelLarge)
+                    }
+                }
+            }
         }
+
+        else -> {}
     }
 }
 
@@ -100,18 +213,6 @@ private fun Preview() {
         LoginContent(
             LoginState(
                 emailText = "this is preview"
-            )
-        )
-    }
-}
-
-@Composable
-@Preview(showBackground = true)
-private fun PreviewProgress() {
-    ProgrammingMaterialsTheme {
-        LoginContent(
-            LoginState(
-                isProgress = true
             )
         )
     }

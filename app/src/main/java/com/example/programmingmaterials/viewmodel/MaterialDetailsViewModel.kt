@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.programmingmaterials.AuthManager
 import com.example.programmingmaterials.data.repositories.FeedbackRepo
 import com.example.programmingmaterials.data.repositories.MaterialRepo
 import com.example.programmingmaterials.data.repositories.ProgressRepo
@@ -17,6 +18,7 @@ class MaterialDetailsViewModel @Inject constructor(
     materialRepo: MaterialRepo,
     private val progressRepo: ProgressRepo,
     private val feedbackRepo: FeedbackRepo,
+    private val authManager: AuthManager,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val initState = MaterialDetailsScreenState()
@@ -25,7 +27,7 @@ class MaterialDetailsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val materialId = savedStateHandle.get<Int>("materialId")
-            val material = materialRepo.getMaterialById(materialId = materialId!!, userID = 1)
+            val material = materialRepo.getMaterialById(materialId = materialId!!, userID = authManager.getUserId())
             state.value = state.value.copy(
                 materialName = material.name,
                 categoryName = material.category,
@@ -42,7 +44,7 @@ class MaterialDetailsViewModel @Inject constructor(
                 when (state.value.status) {
                     "Не начато" -> {
                         progressRepo.createProgressEntry(
-                            userId = 1,
+                            userId = authManager.getUserId(),
                             materialId = savedStateHandle.get<Int>("materialId")!!,
                             status = "В процессе"
                         )
@@ -51,11 +53,20 @@ class MaterialDetailsViewModel @Inject constructor(
 
                     "Отложено" -> {
                         progressRepo.updateProgressStatus(
-                            userId = 1,
+                            userId = authManager.getUserId(),
                             materialId = savedStateHandle.get<Int>("materialId")!!,
                             newStatus = "В процессе"
                         )
                         updateState("В процессе")
+                    }
+
+                    "В процессе" -> {
+                        progressRepo.updateProgressStatus(
+                            userId = authManager.getUserId(),
+                            materialId = savedStateHandle.get<Int>("materialId")!!,
+                            newStatus = "Завершено"
+                        )
+                        updateState("Завершено")
                     }
                 }
             } catch (e: Exception) {
@@ -70,7 +81,7 @@ class MaterialDetailsViewModel @Inject constructor(
                 when (state.value.status) {
                     "В процессе" -> {
                         progressRepo.updateProgressStatus(
-                            userId = 1,
+                            userId = authManager.getUserId(),
                             materialId = savedStateHandle.get<Int>("materialId")!!,
                             newStatus = "Отложено"
                         )

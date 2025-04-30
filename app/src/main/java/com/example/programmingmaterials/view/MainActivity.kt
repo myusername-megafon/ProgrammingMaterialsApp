@@ -17,7 +17,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -32,7 +35,9 @@ import com.example.programmingmaterials.view.composable.UserProgressScreen
 import com.example.programmingmaterials.navigation.Routes
 import com.example.programmingmaterials.ui.theme.ProgrammingMaterialsTheme
 import com.example.programmingmaterials.view.composable.FeedbacksScreen
+import com.example.programmingmaterials.view.composable.TestScreen
 import com.example.programmingmaterials.viewmodel.MainActivityViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -79,6 +84,12 @@ class MainActivity : ComponentActivity() {
                                 viewModel.setBottomBarVisibility(false)
                             }
                         }
+                        composable<Routes.Tests> {
+                            TestScreen(navController)
+                            LaunchedEffect(Unit) {
+                                viewModel.setBottomBarVisibility(false)
+                            }
+                        }
                         composable(
                             route = Routes.MaterialDetails.route,
                             arguments = listOf(navArgument("materialId") { type = NavType.IntType })
@@ -101,7 +112,7 @@ fun BottomMenu(navController: NavController, viewModel: MainActivityViewModel) {
     NavigationBar(modifier = Modifier) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, null) },
-            label = { Text("Home") },
+            label = { Text("Главная") },
             selected = viewModel.state.value.enabledScreen == Routes.Home,
             onClick = {
                 navController.navigate(Routes.Home)
@@ -110,7 +121,7 @@ fun BottomMenu(navController: NavController, viewModel: MainActivityViewModel) {
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.AccountCircle, null) },
-            label = { Text("Profile") },
+            label = { Text("Профиль") },
             selected = viewModel.state.value.enabledScreen == Routes.UserProfile,
             onClick = {
                 navController.navigate(Routes.UserProfile)
@@ -119,4 +130,3 @@ fun BottomMenu(navController: NavController, viewModel: MainActivityViewModel) {
         )
     }
 }
-
