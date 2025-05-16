@@ -87,7 +87,15 @@ class MaterialDetailsViewModel @Inject constructor(
                         )
                         updateState("Отложено")
                     }
-                    // Добавьте другие кейсы при необходимости
+                    "Не начато" -> {
+                        progressRepo.createProgressEntry(
+                            userId = authManager.getUserId(),
+                            materialId = savedStateHandle.get<Int>("materialId")!!,
+                            status = "Отложено"
+                        )
+                        updateState("Отложено")
+                    }
+
                 }
             } catch (e: Exception) {
                 throw e

@@ -83,6 +83,8 @@ class LoginViewModel @Inject constructor(
                 state.value.passwordText
             )
 
+            state.value = state.value.copy(isProgress = false)
+
             if (!success) {
                 state.value = state.value.copy(
                     errorMessage = "Ошибка регистрации. Проверьте данные",
@@ -90,6 +92,8 @@ class LoginViewModel @Inject constructor(
                 )
             }
             else{
+                state.value = state.value.copy(isProgress = true)
+
                 val successLogIn = authManager.logIn(
                     state.value.emailText,
                     state.value.passwordText

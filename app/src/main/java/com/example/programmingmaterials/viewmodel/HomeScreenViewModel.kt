@@ -1,7 +1,6 @@
 package com.example.programmingmaterials.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.programmingmaterials.AuthManager
@@ -43,26 +42,45 @@ class HomeScreenViewModel @Inject constructor(
             )
             val newMaterials = materialRepo.getNewMaterials(userId)
             val startedMaterials = materialRepo.getStartedMaterials(userId)
+            val mappedNewMaterials = newMaterials.map {
+                MaterialProgressUiModel(
+                    id = it.id,
+                    materialName = it.name,
+                    categoryName = it.category,
+                    status = "New",
+                    image = images.random()
+                )
+            }
+            val mappedStartedMaterials = startedMaterials.map {
+                MaterialProgressUiModel(
+                    id = it.id,
+                    materialName = it.name,
+                    categoryName = it.category,
+                    status = "New",
+                    image = images.random()
+                )
+            }
             screenState.value = screenState.value.copy(
-                newMaterialsList = newMaterials.map {
-                    MaterialProgressUiModel(
-                        id = it.id,
-                        materialName = it.name,
-                        categoryName = it.category,
-                        status = "New",
-                        image = images.random()
-                    )
-                },
-                startedMaterialsList = startedMaterials.map {
-                    MaterialProgressUiModel(
-                        id = it.id,
-                        materialName = it.name,
-                        categoryName = it.category,
-                        status = "New",
-                        image = images.random()
-                    )
-                }
+                newMaterialsList = mappedNewMaterials,
+                startedMaterialsList = mappedStartedMaterials,
+                filteredStartedMaterialsList = mappedStartedMaterials,
+                filteredNewMaterialsList = mappedNewMaterials
             )
         }
+    }
+
+    fun filterMaterials(query: String) {
+        val filteredStarted = screenState.value.startedMaterialsList.filter {
+            it.materialName.contains(query, ignoreCase = true)
+        }
+        val filteredNew = screenState.value.newMaterialsList.filter {
+            it.materialName.contains(query, ignoreCase = true)
+        }
+
+        screenState.value = screenState.value.copy(
+            searchQuery = query,
+            filteredStartedMaterialsList = filteredStarted,
+            filteredNewMaterialsList = filteredNew
+        )
     }
 }

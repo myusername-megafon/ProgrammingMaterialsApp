@@ -11,13 +11,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -82,44 +82,35 @@ private fun LoginContent(
         !screenState.isLoginScreen -> {
             if (screenState.isProgress) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    CircularProgressIndicator()
                 }
             } else {
                 Column(
-                    Modifier.fillMaxSize(),
+                    Modifier.padding(horizontal = 32.dp).fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     OutlinedTextField(
                         isError = screenState.isDataError,
                         value = screenState.FIOValue,
-                        label = { Text("ФИО", style = MaterialTheme.typography.bodyMedium) },
+                        label = { Text("ФИО") },
                         onValueChange = onEditFIOReg,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                        )
+                        maxLines = 1
                     )
                     OutlinedTextField(
                         isError = screenState.isDataError,
                         value = screenState.emailText,
-                        label = { Text("Email", style = MaterialTheme.typography.bodyMedium) },
+                        label = { Text("Email") },
                         onValueChange = onEditEmail,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                        )
+                        maxLines = 1
                     )
                     OutlinedTextField(
                         isError = screenState.isDataError,
                         visualTransformation = PasswordVisualTransformation(),
                         value = screenState.passwordText,
-                        label = { Text("Пароль", style = MaterialTheme.typography.bodyMedium) },
+                        label = { Text("Пароль") },
                         onValueChange = onEditPassword,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                        )
+                        maxLines = 1
                     )
                     Spacer(Modifier.size(8.dp))
                     Button(
@@ -148,34 +139,28 @@ private fun LoginContent(
         screenState.isLoginScreen -> {
             if (screenState.isProgress) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    CircularProgressIndicator()
                 }
             } else {
                 Column(
-                    Modifier.fillMaxSize(),
+                    Modifier.padding(horizontal = 32.dp).fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     OutlinedTextField(
                         isError = screenState.isDataError,
                         value = screenState.emailText,
-                        label = { Text("Email", style = MaterialTheme.typography.bodyMedium) },
+                        label = { Text("Email") },
                         onValueChange = onEditEmail,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                        )
+                        maxLines = 1
                     )
                     OutlinedTextField(
                         isError = screenState.isDataError,
                         visualTransformation = PasswordVisualTransformation(),
                         value = screenState.passwordText,
-                        label = { Text("Пароль", style = MaterialTheme.typography.bodyMedium) },
+                        label = { Text("Пароль") },
                         onValueChange = onEditPassword,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                        )
+                        maxLines = 1
                     )
                     Spacer(Modifier.size(8.dp))
                     Button(

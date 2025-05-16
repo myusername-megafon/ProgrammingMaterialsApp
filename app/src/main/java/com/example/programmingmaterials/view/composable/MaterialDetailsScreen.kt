@@ -195,7 +195,7 @@ fun MaterialDetailsScreenContent(
                     .padding(horizontal = 8.dp)
             ) {
                 Button(
-                    onClick = { /* ... */ },
+                    onClick = { onStartButtonClick() },
                     modifier = Modifier
                         .weight(0.8f)
                         .height(48.dp),

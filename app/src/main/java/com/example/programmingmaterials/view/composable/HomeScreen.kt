@@ -42,6 +42,9 @@ fun HomeScreen(navController: NavController) {
                 state = screenState.value,
                 onMaterialClick = { materialId ->
                     navController.navigate(Routes.MaterialDetails.createRoute(materialId))
+                },
+                onSearchQueryChange = { query ->
+                    viewModel.filterMaterials(query)
                 }
             )
         }
@@ -51,7 +54,8 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun HomeScreenContent(
     state: HomeScreenState,
-    onMaterialClick: (Int) -> Unit
+    onMaterialClick: (Int) -> Unit,
+    onSearchQueryChange: (String) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -59,8 +63,10 @@ fun HomeScreenContent(
     ) {
         Column {
             TextField(
-                value = "",
-                onValueChange = {},
+                value = state.searchQuery,
+                onValueChange = { query ->
+                    onSearchQueryChange(query)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
@@ -90,7 +96,7 @@ fun HomeScreenContent(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(8.dp)
             ) {
-                items(state.startedMaterialsList) {
+                items(state.filteredStartedMaterialsList) {
                     MaterialProgressCard2(
                         uiModel = it,
                         cardColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -116,7 +122,7 @@ fun HomeScreenContent(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(8.dp)
             ) {
-                items(state.newMaterialsList) {
+                items(state.filteredNewMaterialsList) {
                     MaterialProgressCard2(
                         uiModel = it,
                         cardColor = MaterialTheme.colorScheme.surface,
@@ -131,7 +137,7 @@ fun HomeScreenContent(
 @Preview(showBackground = true)
 fun MainScreenPreview() {
     ProgrammingMaterialsTheme {
-        HomeScreenContent(HomeScreenState()) {
+        HomeScreenContent(HomeScreenState(),{}) {
         }
     }
 }
